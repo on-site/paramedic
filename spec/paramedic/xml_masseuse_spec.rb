@@ -3,10 +3,10 @@ require 'nokogiri'
 module Paramedic
   describe XMLMasseuse do
     describe '#to_xml' do
-      subject{ described_class.new(xml: xml, double_encode: double_encode).to_xml }
+      subject{ described_class.new(xml, escape_tags: escape_tags).to_xml }
 
-      context 'with no double encode tags specified' do
-        let(:double_encode) { [] }
+      context 'with no escape tags specified' do
+        let(:escape_tags) { [] }
 
         let(:xml) {
           <<-end_of_xml
@@ -77,20 +77,31 @@ module Paramedic
       end
 
       context 'with double encode tags specified' do
-        let(:double_encode) { ['COMMENT'] }
+        let(:escape_tags) { ['COMMENT'] }
+
+        let(:expected_result) { <<-end_of_xml
+<?xml version="1.0"?>
+<ViewCommand><COMMENT>&lt;html&gt;&lt;body&gt;&lt;p&gt;None&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</COMMENT></ViewCommand>
+end_of_xml
+        }
 
         let(:xml) {
           <<-end_of_xml
 <?xml version="1.0"?>
 <ViewCommand>
   <COMMENT>
-    <html><body><p>None</body></html>
+    <html>
+      <body>
+        <p>None</p>
+      </body>
+    </html>
   </COMMENT>
 </ViewCommand>
           end_of_xml
         }
 
         it 'html escapes specified elements' do
+          expect(subject).to eq expected_result
           puts subject
         end
       end
