@@ -43,7 +43,7 @@ Let's say that you have an XML document assigned to a variable like so:
 If you want the <superheroes /> element's children to be treated like they're not part of the XML document,
 do the following:
 
-    > Paramedic::XmlMasseuse.new(xml: xml, double_encoding: ['superheroes']).to_xml
+    > Paramedic::XmlMasseuse.new(xml: xml, escape_tags: ['superheroes']).to_xml
 
 The result will be the following string:
 

@@ -1,30 +1,32 @@
 require 'nokogiri'
+require 'cgi'
 
 module Paramedic
   class XMLMasseuse
-    def initialize(xml:, double_encode: [])
+    def initialize(xml, opts={})
       @xml = xml
-      @double_encode = double_encode
+      @escape_tags = opts.fetch(:escape_tags, [])
     end
 
     def to_xml
-      xml_document = Nokogiri::XML(xml){
-        |x| x.noblanks
-      }
-
-      double_encode.each do |element_name|
-        elements = xml_document.select(element_name)
-
-        puts elements
+      xml_document = Nokogiri::XML(xml, &:noblanks)
+      escape_tags.each do |escape_tag|
+        xml_document.css(escape_tag).each do |element|
+          strip_tag_spacing(element)
+          element.inner_html = CGI.escape_html(element.inner_html)
+        end
       end
-
-      xml_document.to_xml(
-        save_with: Nokogiri::XML::Node::SaveOptions::NO_EMPTY_TAGS
-      )
+      strip_tag_spacing(xml_document)
     end
 
     private
 
-    attr_reader :double_encode, :xml
+    def strip_tag_spacing(xml)
+      xml.to_xml(
+        save_with: Nokogiri::XML::Node::SaveOptions::NO_EMPTY_TAGS
+      )
+    end
+
+    attr_reader :escape_tags, :xml
   end
 end
