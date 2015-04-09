@@ -1,6 +1,6 @@
-require "paramedic/version"
-require "paramedic/encoder"
-require "paramedic/xml_therapist"
+require_relative 'paramedic/version'
+require_relative 'paramedic/encoder'
+require_relative 'paramedic/xml_masseuse'
 
 module Paramedic
 end

@@ -1,10 +1,15 @@
 require 'nokogiri'
 
 module Paramedic
-  describe XMLTherapist do
-    describe '#massage' do
-      let(:xml) {
-        <<-end_of_xml
+  describe XMLMasseuse do
+    describe '#to_xml' do
+      subject{ described_class.new(xml: xml, double_encode: double_encode).to_xml }
+
+      context 'with no double encode tags specified' do
+        let(:double_encode) { [] }
+
+        let(:xml) {
+          <<-end_of_xml
 <?xml version="1.0"?>
 <ViewCommand><GROUP>WEB_RMLEAS</GROUP><PAGE>OCCP</PAGE><COMMAND>SAVE</COMMAND><PARMS>~GROUP=WEB_RMLEAS~MENU=NONE~WHERE=NAME.NAMEID='{{id}}'~INFRAME=Y~PARENTMENUNAME=WEB_RMHOME~PARENTMENUID=MRI_69~PARENTSAVE=Y~PATH=C:\\Program Files (x86)\\MriWeb\\~URL=/mripage.asp~</PARMS>
   <CURRENTKEY>~NAMEID={{id}}~</CURRENTKEY>
@@ -59,21 +64,35 @@ module Paramedic
   </COMMENT>
   <APPLID></APPLID>
 </ViewCommand>
-end_of_xml
-      }
+          end_of_xml
+        }
 
-      subject{ described_class.new.massage(xml) }
+        it 'removes all but the first newline in between elements' do
+          expect(subject.scan(/>\n</).count).to be 1
+        end
 
-      it 'removes all but the first newline in between elements' do
-        expect(subject.scan(/>\n</).count).to be 1
+        it 'does not collapse elements' do
+          expect(subject.scan(/<USERQRY><\/USERQRY>/).count).to be 1
+        end
       end
 
-      it 'does not collapse elements' do
-        expect(subject.scan(/<USERQRY><\/USERQRY>/).count).to be 1
-      end
+      context 'with double encode tags specified' do
+        let(:double_encode) { ['COMMENT'] }
 
-      it 'html escapes specified elements' do
-        expect(subject.scan(/<USERQRY><\/USERQRY>/).count).to be 1
+        let(:xml) {
+          <<-end_of_xml
+<?xml version="1.0"?>
+<ViewCommand>
+  <COMMENT>
+    <html><body><p>None</body></html>
+  </COMMENT>
+</ViewCommand>
+          end_of_xml
+        }
+
+        it 'html escapes specified elements' do
+          puts subject
+        end
       end
     end
   end
