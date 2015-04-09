@@ -28,23 +28,23 @@ module Paramedic
         ':' => '%3A',
         ',' => '%2C',
         ';' => '%3B',
-        '%0A' => '%0D%0A',
         '#' => '%23',
         '&' => '%24',
         '@' => '%40',
-        #'%' => '%25', # Surprisingly, this one doesn't appear to be replaced. We'll need to confirm.
+        #'%' => '%25',    # Surprisingly, this one doesn't appear to be replaced. We'll need to confirm.
         '+' => '%2B',
         '$' => '%26',
         '<' => '%3C',
         '>' => '%3E',
-        #'~' => '%25', $ Tilde too.
+        #'~' => '%25',    # Tilde too.
         '^' => '%5E',
         '`' => '%60',
         ?\ => '%5C',
         '[' => '%5B',
         ']' => '%5D',
         '|' => '%7C',
-        '"' => '%22'
+        '"' => '%22',
+        '%0A' => '%0D%0A' # This converts back to Microsoft's carriage return line feed funness.
       }
     end
 

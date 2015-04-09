@@ -24,7 +24,7 @@ module Paramedic
 
         context 'with xml' do
           let(:value) {
-            XMLTherapist.new.massage(<<-end_of_xml
+            XMLMasseuse.new(xml: <<-end_of_xml
 <?xml version="1.0"?>
 <ViewCommand><GROUP>WEB_RMLEAS</GROUP><PAGE>OCCP</PAGE><COMMAND>SAVE</COMMAND><PARMS>~GROUP=WEB_RMLEAS~MENU=NONE~WHERE=NAME.NAMEID='{{id}}'~INFRAME=Y~PARENTMENUNAME=WEB_RMHOME~PARENTMENUID=MRI_69~PARENTSAVE=Y~PATH=C:\\Program Files (x86)\\MriWeb\\~URL=/mripage.asp~</PARMS>
   <CURRENTKEY>~NAMEID={{id}}~</CURRENTKEY>
@@ -80,7 +80,7 @@ module Paramedic
   <APPLID></APPLID>
 </ViewCommand>
 end_of_xml
-            )
+            ).to_xml
           }
 
           let(:serialized_value) {

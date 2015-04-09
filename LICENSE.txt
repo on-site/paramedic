@@ -1,4 +1,4 @@
-Copyright (c) 2015 Joseph Jaber
+Copyright (c) 2015 Joseph Jaber, Ryan Cammer
 
 MIT License
 
