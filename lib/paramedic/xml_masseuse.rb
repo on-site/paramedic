@@ -9,21 +9,30 @@ module Paramedic
     end
 
     def to_xml
-      xml_document = Nokogiri::XML(xml, &:noblanks)
+      strip_tag_spacing(
+        escape_specified_tags(
+          Nokogiri::XML(xml, &:noblanks)
+        )
+      )
+    end
+
+    private
+
+    def escape_specified_tags(xml_document)
       escape_tags.each do |escape_tag|
         xml_document.css(escape_tag).each do |element|
           strip_tag_spacing(element)
           element.inner_html = CGI.escape_html(element.inner_html)
         end
       end
-      strip_tag_spacing(xml_document)
+
+      xml_document
     end
 
-    private
-
-    def strip_tag_spacing(xml)
-      xml.to_xml(
-        save_with: Nokogiri::XML::Node::SaveOptions::NO_EMPTY_TAGS
+    def strip_tag_spacing(xml_document)
+      xml_document.to_xml(
+        save_with: Nokogiri::XML::Node::SaveOptions::AS_XML |
+          Nokogiri::XML::Node::SaveOptions::NO_EMPTY_TAGS
       )
     end
 

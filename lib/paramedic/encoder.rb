@@ -29,11 +29,11 @@ module Paramedic
         ',' => '%2C',
         ';' => '%3B',
         '#' => '%23',
-        '&' => '%24',
+        '&' => '%26',
         '@' => '%40',
         #'%' => '%25',    # Surprisingly, this one doesn't appear to be replaced. We'll need to confirm.
         '+' => '%2B',
-        '$' => '%26',
+        '$' => '%24',
         '<' => '%3C',
         '>' => '%3E',
         #'~' => '%25',    # Tilde too.
