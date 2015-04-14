@@ -5,6 +5,39 @@ module Paramedic
     describe '#to_s' do
       subject { described_class.new(args).to_s }
 
+      context 'with single characters' do
+        let(:args) {
+          {
+            'char' => char
+          }
+        }
+
+
+        context 'with a $' do
+          let(:char) { '$' }
+
+          it 'correctly encodes the character' do
+            expect(subject).to eq 'char=%24'
+          end
+        end
+
+        context 'with a %' do
+          let(:char) { '%' }
+
+          it 'correctly encodes the character' do
+            expect(subject).to eq 'char=%25'
+          end
+        end
+
+        context 'with a &' do
+          let(:char) { '&' }
+
+          it 'correctly encodes the character' do
+            expect(subject).to eq 'char=%26'
+          end
+        end
+      end
+
       context 'with a single parameter' do
         let(:args) {
           {

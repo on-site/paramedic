@@ -8,8 +8,54 @@ module Paramedic
       context 'with no escape tags specified' do
         let(:escape_tags) { [] }
 
-        let(:xml) {
-          <<-end_of_xml
+        context 'with a space between tags' do
+          let(:xml) {
+            <<-end_of_xml
+            <root>
+              <a>value1</a>
+              <b>value2</b>
+            </root>
+            end_of_xml
+          }
+
+          it 'strips the spaces between tags' do
+            expect(subject).to eq "<?xml version=\"1.0\"?>\n<root><a>value1</a><b>value2</b></root>\n"
+          end
+
+          it 'has a newline after the declaration' do
+            expect(subject).to include("<?xml version=\"1.0\"?>\n")
+          end
+
+          it 'has a newline at the end of the document' do
+            expect(subject[-1]).to eq "\n"
+          end
+        end
+
+        context 'when there are ampersands within the content' do
+          let(:expected_result) { <<-end_of_xml
+<?xml version="1.0"?>
+<root><MRIX_49_URL><N>~LINK=LOADMODALPAGE{VEHICLE,WEB_RMSHR,,&amp;MENUNAME=WEB_RMHOME&amp;MENUID=MRI_69&amp;INHERITMENU=Y&amp;WHERE=VEHICLE.NAMEID='URLSAFE{CLNTVAL{NAMEID}}'&amp;RETURNCOMMAND=C&amp;PASSED_NAMEID=URLSAFE{CLNTVAL{NAMEID}}}~EXPR=</N></MRIX_49_URL></root>
+          end_of_xml
+          }
+
+          let(:xml) {
+            <<-end_of_xml
+<root>
+  <MRIX_49_URL>
+    <N>~LINK=LOADMODALPAGE{VEHICLE,WEB_RMSHR,,&MENUNAME=WEB_RMHOME&MENUID=MRI_69&INHERITMENU=Y&WHERE=VEHICLE.NAMEID='URLSAFE{CLNTVAL{NAMEID}}'&RETURNCOMMAND=C&PASSED_NAMEID=URLSAFE{CLNTVAL{NAMEID}}}~EXPR=</N>
+  </MRIX_49_URL>
+</root>
+            end_of_xml
+          }
+
+          it 'incorporates the ampersands' do
+            expect(subject).to eq expected_result
+          end
+        end
+
+        context 'with complex xml' do
+          let(:xml) {
+            <<-end_of_xml
 <?xml version="1.0"?>
 <ViewCommand><GROUP>WEB_RMLEAS</GROUP><PAGE>OCCP</PAGE><COMMAND>SAVE</COMMAND><PARMS>~GROUP=WEB_RMLEAS~MENU=NONE~WHERE=NAME.NAMEID='{{id}}'~INFRAME=Y~PARENTMENUNAME=WEB_RMHOME~PARENTMENUID=MRI_69~PARENTSAVE=Y~PATH=C:\\Program Files (x86)\\MriWeb\\~URL=/mripage.asp~</PARMS>
   <CURRENTKEY>~NAMEID={{id}}~</CURRENTKEY>
@@ -64,29 +110,51 @@ module Paramedic
   </COMMENT>
   <APPLID></APPLID>
 </ViewCommand>
-          end_of_xml
-        }
+            end_of_xml
+          }
 
-        it 'removes all but the first newline in between elements' do
-          expect(subject.scan(/>\n</).count).to be 1
-        end
-
-        it 'does not collapse elements' do
-          expect(subject.scan(/<USERQRY><\/USERQRY>/).count).to be 1
+          it 'does not collapse elements' do
+            expect(subject.scan(/<USERQRY><\/USERQRY>/).count).to be 1
+          end
         end
       end
 
       context 'with double encode tags specified' do
         let(:escape_tags) { ['COMMENT'] }
 
-        let(:expected_result) { <<-end_of_xml
+        context 'when the encode tag content is text' do
+          let(:expected_result) { <<-end_of_xml
+<?xml version="1.0"?>
+<ViewCommand><COMMENT>\n  a\nb\n  </COMMENT></ViewCommand>
+          end_of_xml
+          }
+
+          let(:xml) {
+            <<-end_of_xml
+<?xml version="1.0"?>
+<ViewCommand>
+  <COMMENT>
+  a
+b
+  </COMMENT>
+</ViewCommand>
+            end_of_xml
+          }
+
+          it 'html escapes specified elements' do
+            expect(subject).to eq expected_result
+          end
+        end
+
+        context 'when the encode tag content is markup' do
+          let(:expected_result) { <<-end_of_xml
 <?xml version="1.0"?>
 <ViewCommand><COMMENT>&lt;html&gt;&lt;body&gt;&lt;p&gt;None&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</COMMENT></ViewCommand>
-end_of_xml
-        }
+          end_of_xml
+          }
 
-        let(:xml) {
-          <<-end_of_xml
+          let(:xml) {
+            <<-end_of_xml
 <?xml version="1.0"?>
 <ViewCommand>
   <COMMENT>
@@ -97,14 +165,16 @@ end_of_xml
     </html>
   </COMMENT>
 </ViewCommand>
-          end_of_xml
-        }
+            end_of_xml
+          }
 
-        it 'html escapes specified elements' do
-          expect(subject).to eq expected_result
-          puts subject
+          it 'html escapes specified elements' do
+            expect(subject).to eq expected_result
+          end
         end
       end
     end
   end
 end
+
+
