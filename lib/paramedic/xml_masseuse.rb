@@ -11,12 +11,16 @@ module Paramedic
     def to_xml
       strip_tag_spacing(
         escape_specified_tags(
-          Nokogiri::XML(xml, &:noblanks)
+          Nokogiri::XML(remove_naked_ampersands(xml), &:noblanks)
         )
       )
     end
 
     private
+
+    def remove_naked_ampersands(text)
+      text.gsub('&', '&amp;')
+    end
 
     def escape_specified_tags(xml_document)
       escape_tags.each do |escape_tag|

@@ -31,6 +31,28 @@ module Paramedic
           end
         end
 
+        context 'when there are ampersands within the content' do
+          let(:expected_result) { <<-end_of_xml
+<?xml version="1.0"?>
+<root><MRIX_49_URL><N>~LINK=LOADMODALPAGE{VEHICLE,WEB_RMSHR,,&amp;MENUNAME=WEB_RMHOME&amp;MENUID=MRI_69&amp;INHERITMENU=Y&amp;WHERE=VEHICLE.NAMEID='URLSAFE{CLNTVAL{NAMEID}}'&amp;RETURNCOMMAND=C&amp;PASSED_NAMEID=URLSAFE{CLNTVAL{NAMEID}}}~EXPR=</N></MRIX_49_URL></root>
+          end_of_xml
+          }
+
+          let(:xml) {
+            <<-end_of_xml
+<root>
+  <MRIX_49_URL>
+    <N>~LINK=LOADMODALPAGE{VEHICLE,WEB_RMSHR,,&MENUNAME=WEB_RMHOME&MENUID=MRI_69&INHERITMENU=Y&WHERE=VEHICLE.NAMEID='URLSAFE{CLNTVAL{NAMEID}}'&RETURNCOMMAND=C&PASSED_NAMEID=URLSAFE{CLNTVAL{NAMEID}}}~EXPR=</N>
+  </MRIX_49_URL>
+</root>
+            end_of_xml
+          }
+
+          it 'incorporates the ampersands' do
+            expect(subject).to eq expected_result
+          end
+        end
+
         context 'with complex xml' do
           let(:xml) {
             <<-end_of_xml
@@ -154,3 +176,5 @@ b
     end
   end
 end
+
+
